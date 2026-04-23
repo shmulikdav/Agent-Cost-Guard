@@ -190,7 +190,7 @@ app.post('/agent/request', async (req, res) => {
   try {
     const { agentId, model, messages, maxTokens = 4000, task } = req.body;
 
-    if (!agentId || !model || !messages) {
+    if (!agentId || !model || !Array.isArray(messages) || messages.length === 0) {
       return res.status(400).json({ status: 'denied', reason: 'missing_fields' });
     }
 
@@ -230,6 +230,15 @@ app.post('/agent/request', async (req, res) => {
         resolve({ approved: false, reason: 'approval_timeout' });
       }, CONFIG.approvalTimeoutMs);
       pendingApprovals.set(requestId, { resolve, timeout, slackRef });
+    });
+
+    req.on('close', () => {
+      const entry = pendingApprovals.get(requestId);
+      if (!entry) return;
+      clearTimeout(entry.timeout);
+      pendingApprovals.delete(requestId);
+      updateSlackMessage(slackRef, '🔌 Request abandoned (client disconnected)', 'Cancelled');
+      entry.resolve({ approved: false, reason: 'client_disconnected' });
     });
 
     console.log(`[pending] ${agentId} est=$${estimatedCost.toFixed(2)} id=${requestId}`);
@@ -345,7 +354,7 @@ app.post('/admin/reset-monthly', requireAdminToken, (_req, res) => {
 app.get('/health', (_req, res) => {
   res.json({
     status:           'ok',
-    monthlySpend:     Number(monthlySpend.toFixed(4)),
+    monthlySpend:     Number(monthlySpend.toFixed(2)),
     budget:           CONFIG.monthlyBudget,
     utilizationPct:   Math.round((monthlySpend / CONFIG.monthlyBudget) * 100),
     pendingApprovals: pendingApprovals.size,

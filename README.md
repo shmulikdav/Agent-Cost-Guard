@@ -139,6 +139,7 @@ const result = await response.json();
 
 - `monthly_budget_exceeded` — hard stop, reset needed
 - `approval_timeout` — no human clicked within 5 min
+- `client_disconnected` — agent gave up before Slack approval came in
 - `missing_fields` — bad request
 
 ## 🔧 Configuration
@@ -190,6 +191,12 @@ system. Before you put it in front of real agents:
 
 - **Storage:** `monthlySpend`, `alertSent`, and `pendingApprovals` live in
   memory. Restart and they reset. Back them with Redis or Postgres.
+- **Concurrency on approvals:** while a large request waits for Slack approval
+  (up to 5 min), no budget is reserved for it. If many large requests pile up
+  during one wait, all of them can pass the initial budget check and
+  collectively over-book the cap. For low-traffic deployments this is a
+  non-issue; for higher volume, reserve at the time of approval-request, not
+  at execution.
 - **Token estimation:** `JSON.stringify(messages).length / 4` is deliberately
   rough. Overestimates ~10–20% (errs safe). Swap in `tiktoken` for precision.
 - **Cron:** `/admin/reset-monthly` exists but nothing calls it. Set up a cron
@@ -206,8 +213,6 @@ system. Before you put it in front of real agents:
 
 Part of a family of AI agent guardrails I'm building:
 
-- **[prompt-lock](https://github.com/shmulikdav/prompt-lock)** — lock your
-  prompts to prevent drift between versions
 - **agent-circuit-breaker** *(coming soon)* — stop runaway agents
 - **llm-output-guard** *(coming soon)* — validate structured LLM output
 

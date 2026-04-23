@@ -1,6 +1,6 @@
 {
   "name": "agent-cost-guard",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Approval gateway + budget monitor for AI coding agents. Puts human approval between your agent and OpenAI for expensive calls.",
   "type": "module",
   "main": "agent-cost-guard.js",
