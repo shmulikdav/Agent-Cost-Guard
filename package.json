@@ -1,0 +1,41 @@
+{
+  "name": "agent-cost-guard",
+  "version": "0.1.0",
+  "description": "Approval gateway + budget monitor for AI coding agents. Puts human approval between your agent and OpenAI for expensive calls.",
+  "type": "module",
+  "main": "agent-cost-guard.js",
+  "scripts": {
+    "start": "node agent-cost-guard.js",
+    "dev": "node --watch agent-cost-guard.js"
+  },
+  "keywords": [
+    "ai",
+    "agents",
+    "openai",
+    "coding-agent",
+    "cost-control",
+    "budget",
+    "slack",
+    "approval",
+    "llm-ops",
+    "agent-guardrails"
+  ],
+  "author": "Shmulik Davar <shmulik@braightwave.com> (https://www.braightwave.com/)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shmulikdav/agent-cost-guard.git"
+  },
+  "bugs": {
+    "url": "https://github.com/shmulikdav/agent-cost-guard/issues"
+  },
+  "homepage": "https://github.com/shmulikdav/agent-cost-guard#readme",
+  "dependencies": {
+    "@slack/web-api": "^7.0.0",
+    "express": "^4.19.0",
+    "openai": "^4.60.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
